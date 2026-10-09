@@ -48,7 +48,7 @@ class motion_executioner(Node):
         self.laser_logger=Logger('laser_content_'+str(motion_types[motion_type])+'.csv', headers=["ranges", "angle_increment", "stamp"])
         
         # TODO Part 3: Create the QoS profile by setting the proper parameters in (...)
-        qos=QoSProfile(reliability=ReliabilityPolicy.RELIABLE,
+        qos=QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT,
                        durability=DurabilityPolicy.VOLATILE,
                        history=HistoryPolicy.KEEP_LAST, 
                        depth=10)
@@ -186,21 +186,21 @@ class motion_executioner(Node):
 
     def make_circular_twist(self):
         msg=Twist()
-        msg.linear.x = 1 # m/s
-        msg.angular.z = 1 # rad/s
+        msg.linear.x = 0.3 # m/s
+        msg.angular.z = 1.0 # rad/s
         return msg
 
     def make_spiral_twist(self):
         msg=Twist()
-        self.radius_ += 0.01 # m
-        msg.angular.z = 0.1 # rad/s
+        self.radius_ += 0.005 # m
+        msg.angular.z = 0.5 # rad/s
         # v = r * w
         msg.linear.x = self.radius_ * msg.angular.z # m/s
         return msg
     
     def make_acc_line_twist(self):
         msg=Twist()
-        self.linear_velocity += 0.01 # m/s
+        self.linear_velocity += 0.05 # m/s
         msg.linear.x = self.linear_velocity # m/s
         msg.angular.z = 0.0 # rad/s
         return msg
