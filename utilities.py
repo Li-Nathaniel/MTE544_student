@@ -24,12 +24,18 @@ class Logger:
             vals_str=""
 
             # TODO Part 5: Write the values from the list to the file
+
+            # loop through the values and convert each one to a string
             for value in values_list:
                 vals_str += str(value)
+
+                # add a comma and space between values
                 vals_str += ", "
             
+            # add a new line after all values have been added
             vals_str+="\n"
             
+            # write the values to the file
             file.write(vals_str)
             
 
@@ -87,11 +93,16 @@ def euler_from_quaternion(quat):
     Convert quaternion (w in last place) to euler roll, pitch, yaw.
     quat = [x, y, z, w]
     """
+
+    # extract the four quaternion components
     x, y, z, w = quat
 
+    # calculate the yaw angle from the quaternion
+    # use atan2 to account for the correct quadrant
     yaw = atan2(
         2.0 * (w * z + x * y),
         1.0 - 2.0 * (y * y + z * z)
     )
 
+    # return the yaw angle in radians
     return yaw
