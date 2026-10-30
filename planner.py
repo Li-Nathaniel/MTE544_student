@@ -22,8 +22,9 @@ class planner:
     def trajectory_planner(self):
         # the return should be a list of trajectory points: [ [x1,y1], ..., [xn,yn]]
         # return
+        scale = 0.75
         if self.trajectory_type == 'parabola':
-            return [[i*0.025, (i*0.025)**2] for i in range(61)]
+            return [[i*0.025*scale, (i*0.025)**2*scale] for i in range(61)]
         if self.trajectory_type == 'sigmoid':
-            return [[i*0.025, 2/(1+exp(-2*i*0.025))-1] for i in range(101)]
+            return [[i*0.025*scale, (2/(1+exp(-2*i*0.025))-1)*scale] for i in range(101)]
         raise ValueError('Unknown trajectory: '+self.trajectory_type)

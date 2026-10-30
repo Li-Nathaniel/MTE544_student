@@ -17,7 +17,7 @@ from controller import controller, trajectoryController
 class decision_maker(Node):
     def __init__(self, publisher_msg, publishing_topic, qos_publisher, goalPoint,
                  rate=10, motion_type=POINT_PLANNER, control_type=P,
-                 trajectory_type='parabola', max_linear=0.22, max_angular=2.84):
+                 trajectory_type='parabola', max_linear=0.46, max_angular=1.90):
         super().__init__("decision_maker")
         #TODO Part 4: Create a publisher for the topic responsible for robot's motion
         self.publisher=self.create_publisher(publisher_msg, publishing_topic, qos_publisher)
@@ -31,7 +31,7 @@ class decision_maker(Node):
                                        control_type=control_type, max_linear=max_linear, max_angular=max_angular)
             self.planner=planner(POINT_PLANNER)
         elif motion_type==TRAJECTORY_PLANNER:
-            self.controller=trajectoryController(klp=0.2, klv=0.05, kli=0.01, kap=0.8, kav=0.05, kai=0.01,
+            self.controller=trajectoryController(klp=0.2, klv=0.05, kli=0.01, kap=0.4, kav=0.6, kai=0.01,
                                                  control_type=control_type, max_linear=max_linear, max_angular=max_angular)
             self.planner=planner(TRAJECTORY_PLANNER, trajectory_type)
         else:
@@ -81,7 +81,7 @@ def main(args=None):
     init()
     # TODO Part 3: You migh need to change the QoS profile based on whether you're using the real robot or in simulation.
     # Remember to define your QoS profile based on the information available in "ros2 topic info /odom --verbose" as explained in Tutorial 3
-    odom_qos=QoSProfile(reliability=ReliabilityPolicy.RELIABLE,
+    odom_qos=QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT,
                         durability=DurabilityPolicy.VOLATILE,
                         history=HistoryPolicy.KEEP_LAST, depth=10)
     control_type={'p':P, 'pd':PD, 'pi':PI, 'pid':PID}[args.control.lower()]
