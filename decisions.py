@@ -33,7 +33,13 @@ class decision_maker(Node):
 
 
         # TODO Part 3: use the Kalman Filter
-        self.localizer=localization(...)
+        
+        # Initialize the EKF-based localization.
+        # The prediction interval is based on the controller publishing rate.
+        self.localizer = localization(
+            kalmanFilter,
+            1.0 / rate
+        )
         
         if motion_type==POINT_PLANNER:
             self.controller=controller(klp=0.2, klv=0.5, kap=0.8, kav=0.6)      
