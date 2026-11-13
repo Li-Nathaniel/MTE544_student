@@ -54,7 +54,7 @@ class localization(Node):
 
         # Process noise covariance (6 states).
         # Controls how much uncertainty is assigned to the motion model.
-        Q = 0.5 * np.eye(6)
+        Q = 0.01 * np.eye(6)
 
         # Measurement noise covariance (4 measurements).
         # Controls how much confidence is assigned to IMU and odometry.
@@ -156,6 +156,13 @@ class localization(Node):
             xhat[1],
             stamp
         ])
+
+        self.odom_logger.log_values([
+            euler_from_quaternion(odom_msg.pose.pose.orientation),
+            odom_msg.pose.pose.position.x,
+            odom_msg.pose.pose.position.y,
+            stamp
+        ])
       
     def odom_callback(self, pose_msg):
         
@@ -164,7 +171,7 @@ class localization(Node):
                     euler_from_quaternion(pose_msg.pose.pose.orientation),
                     pose_msg.header.stamp]
 
-        self.odom_logger.log_values(self.pose)
+    
 
 
 
