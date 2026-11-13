@@ -8,7 +8,7 @@ from utilities import euler_from_quaternion, calculate_angular_error, calculate_
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 
-from rclpy.qos import QoSProfile
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy
 from nav_msgs.msg import Odometry as odom
 
 from sensor_msgs.msg import Imu
@@ -21,7 +21,7 @@ import message_filters
 
 rawSensors=0
 kalmanFilter=1
-odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
+odom_qos=QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, durability=DurabilityPolicy.VOLATILE, history=HistoryPolicy.KEEP_LAST, depth=10)
 
 class localization(Node):
     
@@ -30,6 +30,7 @@ class localization(Node):
         super().__init__("localizer")
 
         self.loc_logger=Logger( loggerName , loggerHeaders)
+        self.odom_logger=Logger("odomPose.csv", ["odom_x", "odom_y", "orientation", "stamp"])
         self.pose=None
         
         if type==rawSensors:
@@ -53,7 +54,7 @@ class localization(Node):
 
         # Process noise covariance (6 states).
         # Controls how much uncertainty is assigned to the motion model.
-        Q = 0.01 * np.eye(6)
+        Q = 0.5 * np.eye(6)
 
         # Measurement noise covariance (4 measurements).
         # Controls how much confidence is assigned to IMU and odometry.
@@ -79,7 +80,8 @@ class localization(Node):
         self.imu_sub = message_filters.Subscriber(
             self,
             Imu,
-            "/imu"
+            "/imu",
+            qos_profile=odom_qos
         )
 
         # Synchronize odometry and IMU messages.
@@ -161,6 +163,12 @@ class localization(Node):
                     pose_msg.pose.pose.position.y,
                     euler_from_quaternion(pose_msg.pose.pose.orientation),
                     pose_msg.header.stamp]
+
+        self.odom_logger.log_values(self.pose)
+
+
+
+        
 
     # Return the estimated pose
     def getPose(self):
