@@ -157,6 +157,8 @@ class localization(Node):
             stamp
         ])
 
+        # Log the raw odometry pose (orientation, x, y) with the same
+        # timestamp, so it can be plotted against the EKF estimate.
         self.odom_logger.log_values([
             euler_from_quaternion(odom_msg.pose.pose.orientation),
             odom_msg.pose.pose.position.x,
