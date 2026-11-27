@@ -11,7 +11,8 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 
 
-from rclpy.qos import QoSProfile
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy
+from nav_msgs.msg import Odometry as odom
 from nav_msgs.msg import Odometry as odom
 
 from localization import localization, rawSensors, kalmanFilter
@@ -46,7 +47,7 @@ class decision_maker(Node):
         self.reachThreshold=0.1
     
         # TODO PART 5 your localization type
-        self.localizer=localization(rawSensors)
+        self.localizer=localization(kalmanFilter)
 
         
         if motion_type==POINT_PLANNER:
@@ -164,8 +165,7 @@ def main(args=None):
     
     init()
     
-    odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
-    
+    odom_qos=QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, durability=DurabilityPolicy.VOLATILE, history=HistoryPolicy.KEEP_LAST, depth=10)    
     if args.motion == "point":
         DM=decision_maker(Twist, "/cmd_vel", 10, motion_type=POINT_PLANNER)
     elif args.motion == "trajectory":

@@ -9,7 +9,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 
 
-from rclpy.qos import QoSProfile
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy
 from nav_msgs.msg import Odometry as odom
 
 from sensor_msgs.msg import Imu
@@ -24,12 +24,12 @@ import message_filters
 
 rawSensors=0; kalmanFilter=1
 
-odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
+odom_qos=QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, durability=DurabilityPolicy.VOLATILE, history=HistoryPolicy.KEEP_LAST, depth=10)
 
 
 class localization(Node):
     
-    def __init__(self, type, loggerName="robotPose.csv", loggerHeaders=["imu_ax", "imu_ay", "kf_ax", "kf_ay","kf_vx","kf_w","kf_x", "kf_y","stamp"]):
+    def __init__(self, type, loggerName="robot_pose.csv", loggerHeaders=["imu_ax", "imu_ay", "kf_ax", "kf_ay","kf_vx","kf_w","kf_x", "kf_y","stamp"]):
 
         super().__init__("localizer")
         
@@ -101,6 +101,16 @@ class localization(Node):
                             xhat[1],
                             normalize_angle(xhat[2]),
                             odom_msg.header.stamp])
+        self.loc_logger.log_values([
+            imu_msg.linear_acceleration.x,
+            imu_msg.linear_acceleration.y,
+            xhat[5],
+            xhat[4] * xhat[3],
+            xhat[4],
+            xhat[3],
+            xhat[0],
+            xhat[1],
+            Time.from_msg(odom_msg.header.stamp).nanoseconds])
         
     def odom_callback(self, pose_msg):
         
